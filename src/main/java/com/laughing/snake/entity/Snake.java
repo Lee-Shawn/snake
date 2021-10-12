@@ -1,17 +1,58 @@
 package com.laughing.snake.entity;
 
-import com.laughing.snake.common.Constant;
-import com.laughing.snake.common.Direction;
+import com.laughing.snake.config.GameConfig;
 
 import java.util.LinkedList;
 
 /**
  * @author : laughing
- * @create : 2021-08-24 23:23
+ * @create : 2021-09-14 23:24
  * @description : 蛇
  */
 public class Snake {
+    /**
+     * 获取游戏区域边框宽度左位移
+     */
+    private static final int MIN_X = GameConfig.getSysConfig().getMinX();
+    /**
+     * 获取游戏区域边框宽度右位移
+     */
+    private static final int MAX_X = GameConfig.getSysConfig().getMaxX();
+    /**
+     * 获取游戏区域边框高度左位移
+     */
+    private static final int MIN_Y = GameConfig.getSysConfig().getMinY();
+    /**
+     * 获取游戏区域边框高度右位移
+     */
+    private static final int MAX_Y = GameConfig.getSysConfig().getMaxY();
+    /**
+     * 游戏区域间隔
+     */
+    private static final int INTERVAL = GameConfig.getFrameConfig().getInterval();
+
+    /**
+     * LinkedList 存储蛇
+     */
     private final LinkedList<Node> snake = new LinkedList<>();
+
+    /**
+     * 移动
+     * @param moveX x 坐标偏移量
+     * @param moveY y 坐标偏移量
+     * @return 是否出界
+     */
+    public boolean move(int moveX, int moveY) {
+        int newX = this.getHead().getX() + moveX * INTERVAL;
+        int newY = this.getHead().getY() + moveY * INTERVAL;
+        if (this.isOverZone(newX, newY)) {
+            return false;
+        }
+        Node head = new Node(newX, newY);
+        this.snake.addFirst(head);
+        this.snake.removeLast();
+        return true;
+    }
 
     /**
      * 判断蛇是否吃到食物
@@ -20,99 +61,17 @@ public class Snake {
      */
     public boolean eat(Node food) {
         // 如果食物和蛇头碰撞，则将食物加入蛇的身体
-        return isCollision(snake.getFirst(), food);
+        return isFoodAndSnakeCollision(snake.getFirst(), food);
     }
 
     /**
-     * 蛇头和食物是否碰撞
-     * @param head 蛇头
-     * @param food  食物
-     * @return      碰撞
+     * 判断是否超出边界
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return  是否出界
      */
-    private boolean isCollision(Node head, Node food) {
-        return Math.abs(head.getX() - food.getX()) + Math.abs(head.getY() - food.getY()) <= Constant.NODE_SIZE;
-    }
-
-    /**
-     * 蛇的移动
-     * @param direction 方向
-     * @return 移动之前的蛇尾
-     */
-    public Node move(Direction direction) {
-        Node head = null;
-        // 根据移动方向更新蛇的身体，将最后一个结点移动到第一个结点
-        switch (direction) {
-            case UP:
-                // 超出边界，不让蛇移动
-                if (this.getHead().getY() < Constant.NODE_SIZE) {
-                    head = new Node(this.getHead().getX(), Constant.NODE_SIZE);
-                    //return this.snake.getLast();
-                } else {
-                    head = new Node(this.getHead().getX(), this.getHead().getY() - Constant.NODE_SIZE);
-                }
-                break;
-            case RIGHT:
-                if (this.getHead().getX() > Constant.GAME_AREA_WIDTH - Constant.NODE_SIZE) {
-                    head = new Node(Constant.GAME_AREA_WIDTH - Constant.NODE_SIZE, this.getHead().getY());
-                    //return this.snake.getLast();
-                } else {
-                    head = new Node(this.getHead().getX() + Constant.NODE_SIZE, this.getHead().getY());
-                }
-                break;
-            case DOWN:
-                if (this.getHead().getY() > Constant.GAME_AREA_HEIGHT - Constant.NODE_SIZE) {
-                    head = new Node(this.getHead().getX(), Constant.GAME_AREA_WIDTH - Constant.NODE_SIZE);
-                    //return this.snake.getLast();
-                } else {
-                    head = new Node(this.getHead().getX(), this.getHead().getY() + Constant.NODE_SIZE);
-                }
-                break;
-            case LEFT:
-                if (this.getHead().getX() < Constant.NODE_SIZE) {
-                    head = new Node(Constant.NODE_SIZE, this.getHead().getY());
-                    //return this.snake.getLast();
-                } else {
-                    head = new Node(this.getHead().getX() - Constant.NODE_SIZE, this.getHead().getY());
-                }
-                break;
-            default:
-                break;
-        }
-        // 返回移动之前的尾部 Node
-        Node last = this.snake.getLast();
-        // 身体其他部位不动，头部新增一个结点，尾部删除结点
-        this.snake.addFirst(head);
-        this.snake.removeLast();
-        //System.out.println("head:" + head.getX() + "," + head.getY());
-        return last;
-    }
-
-    /**
-     * 判断生成的食物有没有和蛇重合
-     * @return 重合的结果
-     */
-    public boolean isCoincidence(Node node) {
-        for (Node n : snake) {
-            if (Math.abs(n.getX() - node.getX()) + Math.abs(n.getY() - node.getY()) < Constant.NODE_SIZE) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断蛇头是否碰到身体
-     * @param head 蛇头
-     * @return 碰撞结果
-     */
-    public boolean isSelfCollision(Node head) {
-        for (int i = 1; i < snake.size(); i++) {
-            if (Math.abs(snake.get(i).getX() - head.getX()) +
-                    Math.abs(snake.get(i).getY() - head.getY()) < Constant.NODE_SIZE) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isOverZone(int x, int y) {
+        return x < MIN_X || x > MAX_X * INTERVAL || y < MIN_Y || y > MAX_Y * INTERVAL;
     }
 
     /**
@@ -136,5 +95,55 @@ public class Snake {
      */
     public LinkedList<Node> getBody()  {
         return snake;
+    }
+
+    /**
+     * 生成的食物是否与蛇重合
+     * @param food 食物
+     * @return 是否重合
+     */
+    public boolean isFoodAndSnakeCoincidence(Node food) {
+        for (Node s : snake) {
+            if (isCoincidence(s.getX(), s.getY(), food.getX(), food.getY())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 蛇是否碰撞到自己身体
+     * @param head 蛇头
+     * @return 是否碰撞
+     */
+    public boolean isSnakeCoincidenceSelf(Node head) {
+        for (int i = 1; i < snake.size(); i++) {
+            if (isCoincidence(snake.get(i).getX(), snake.get(i).getY(), head.getX(), head.getY())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 蛇头是否吃到食物
+     * @param head 蛇头
+     * @param food 食物
+     * @return     碰撞
+     */
+    private boolean isFoodAndSnakeCollision(Node head, Node food) {
+        return isCoincidence(head.getX(), head.getY(), food.getX(), food.getY());
+    }
+
+    /**
+     * 节点是否重合
+     * @param x1 a 节点 x 坐标
+     * @param y1 a 节点 y 坐标
+     * @param x2 b 节点 x 坐标
+     * @param y2 b 节点 y 坐标
+     * @return 是否重合
+     */
+    private boolean isCoincidence(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2) < GameConfig.getFrameConfig().getInterval();
     }
 }

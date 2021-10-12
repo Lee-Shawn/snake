@@ -1,106 +1,69 @@
 package com.laughing.snake.view;
 
-import com.laughing.snake.controller.SnakeController;
-import org.jb2011.lnf.beautyeye.ch9_menu.BEMenuItemUI;
-import org.jb2011.lnf.beautyeye.ch9_menu.BEMenuUI;
+import com.laughing.snake.controller.GameController;
 
 import javax.swing.*;
 
 /**
  * @author : laughing
- * @create : 2021-09-04 23:37
+ * @create : 2021-09-13 21:27
  * @description : 游戏菜单
  */
 public class GameMenu extends JMenuBar {
-    // 一级菜单
-    private JMenu menu;
-    private JMenu help;
-    private JMenu about;
-    // 二级菜单
-    private JMenuItem reset;
-    private JMenuItem settings;
-    private JMenuItem exist;
-    private JMenuItem guide;
-    private JMenuItem log;
-    private JMenuItem auth;
+    private final JMenu setting = new JMenu("设置");
 
-    private final SnakeController controller;
+    private final JMenu about = new JMenu("关于");
 
-    public GameMenu() {
-        this.initMenu();
-        this.setTheme();
-        controller = SnakeController.getInstance();
+    private final JCheckBox music = new JCheckBox("音乐");
+
+    private final JMenuItem exist = new JMenuItem("退出");
+
+    private final JMenuItem help = new JMenuItem("帮助");
+
+    private final JMenuItem auth = new JMenuItem("作者");
+
+    private final GameController gameController;
+
+    public GameMenu(GameController gameController) {
+        this.gameController = gameController;
+        this.listener();
     }
 
     /**
-     * 初始化菜单名称
+     * 初始化菜单控件
+     * @param bar 菜单按钮
      */
-    private void initMenu() {
-        menu = new JMenu("设置");
-        help = new JMenu("帮助");
-        about = new JMenu("关于");
-        reset = new JMenuItem("重置游戏");
-        settings = new JMenuItem("设置");
-        exist = new JMenuItem("退出");
-        guide = new JMenuItem("说明");
-        log = new JMenuItem("日志");
-        auth = new JMenuItem("作者");
-    }
-
-    /**
-     * 设置菜单按钮主题
-     */
-    private void setTheme() {
-        menu.setUI(new BEMenuUI());
-        help.setUI(new BEMenuUI());
-        about.setUI(new BEMenuUI());
-        reset.setUI(new BEMenuItemUI());
-        settings.setUI(new BEMenuItemUI());
-        exist.setUI(new BEMenuItemUI());
-        guide.setUI(new BEMenuItemUI());
-        log.setUI(new BEMenuItemUI());
-        auth.setUI(new BEMenuItemUI());
-    }
-
-    /**
-     * 添加菜单到 Frame
-     * @param menuBar 菜单对象
-     */
-    public void addMenu(JMenuBar menuBar) {
-        menuBar.add(menu);
-        menuBar.add(help);
-        menuBar.add(about);
-        menu.add(reset);
-        menu.add(settings);
-        menu.add(exist);
-        help.add(guide);
-        about.add(log);
+    public void initMenu(JMenuBar bar) {
+        bar.add(setting);
+        bar.add(about);
+        setting.add(music);
+        setting.add(exist);
+        about.add(help);
         about.add(auth);
+        // 设置音乐按钮默认选中
+        music.setSelected(true);
     }
 
     /**
-     * 事件监听
+     * 菜单事件监听
      */
-    public void listener() {
-        startListener();
-        settingsListener();
-        existListener();
-        guideListener();
-        logListener();
-        authListener();
+    private void listener() {
+        this.musicListener();
+        this.existListener();
+        this.helpListener();
+        this.authInfoListener();
     }
 
-    private void startListener() {
-        reset.addActionListener(e -> {
-            controller.quit();
-            controller.restartGame();
-        });
+    /**
+     * 音乐开关
+     */
+    private void musicListener() {
+        music.addActionListener(e -> this.gameController.musicSwitch());
     }
 
-    private void settingsListener() {
-
-    }
-
+    /**
+     * 退出游戏
+     */
     private void existListener() {
         exist.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(null, "确认退出？", "确认", JOptionPane.YES_NO_OPTION);
@@ -110,15 +73,31 @@ public class GameMenu extends JMenuBar {
         });
     }
 
-    private void guideListener() {
-
+    /**
+     * 游戏帮助说明
+     */
+    private void helpListener() {
+        help.addActionListener(e -> {
+            String message = "使用说明：\n" +
+                    "1. 点击设置按钮\n" +
+                    "2. 选择控制设置，设置游戏按钮\n" +
+                    "3. 选择皮肤设置，选择游戏皮肤\n" +
+                    "4. 点击开始按钮，开始游戏\n" +
+                    "5. 游戏结束，输入玩家信息保存数据";
+            JOptionPane.showMessageDialog(null, message,"帮助",JOptionPane.INFORMATION_MESSAGE);
+        });
     }
 
-    private void logListener() {
-
-    }
-
-    private void authListener() {
-
+    /**
+     * 版权信息
+     */
+    private void authInfoListener() {
+        auth.addActionListener(e -> {
+            String message = "Version: V2.0.0\n" +
+                    "Auth: 恰似你的温柔\n" +
+                    "GitHub: https://github.com/Lee-Shawn/snake\n" +
+                    "Copyright: laughing 2021";
+            JOptionPane.showMessageDialog(null, message,"作者",JOptionPane.INFORMATION_MESSAGE);
+        });
     }
 }

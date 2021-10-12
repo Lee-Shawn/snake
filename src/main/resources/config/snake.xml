@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<snake>
+    <frame title="贪吃蛇" width="1200" height="950" padding="32" border="7" interval="20">
+        <button w="120" h="40">
+            <start x="860" y="572" />
+            <init x="992" y="572"/>
+        </button>
+        <layer className="com.laughing.snake.view.ui.LayerBackGround" x="0" y="0" w="1200" h="950"/>
+        <layer className="com.laughing.snake.view.ui.LayerGame" x="13" y="13" w="814" h="814"/>
+        <layer className="com.laughing.snake.view.ui.LayerPoint" x="840" y="13" w="294" h="158"/>
+        <layer className="com.laughing.snake.view.ui.LayerDisk" x="840" y="184" w="294" h="336"/>
+        <layer className="com.laughing.snake.view.ui.LayerButton" x="840" y="533" w="294" h="110"/>
+        <layer className="com.laughing.snake.view.ui.LayerAbout" x="840" y="656" w="294" h="171"/>
+    </frame>
+    <system minX="0" maxX="39" minY="0" maxY="39" levelUp="20" experience="10">
+    </system>
+    <data maxRow="5">
+        <dataBase className="com.laughing.snake.dao.DataBase">
+            <param key="load" value="SELECT user_name,point FROM user_point ORDER BY point DESC LIMIT 5"/>
+            <param key="save" value="INSERT INTO user_point(user_name,point,type_id) VALUES (?,?,?)"/>
+        </dataBase>
+        <dataFile className="com.laughing.snake.dao.DataFile">
+            <param key="path" value="src/main/resources/data/recode.dat"/>
+        </dataFile>
+    </data>
+    <setting title="游戏设置" width="914" height="800">
+        <param key="path" value="src/main/resources/data/control.dat" />
+        <method name="keyUp" />
+        <method name="keyLeft" />
+        <method name="keyDown" />
+        <method name="keyRight" />
+        <method name="keySpace" />
+        <method name="keySpeed" />
+        <method name="keyCheating" />
+        <control index="0" x="6" y="328" w="64" h="20" />
+        <control index="1" x="6" y="386" w="64" h="20" />
+        <control index="2" x="6" y="460" w="64" h="20" />
+        <control index="3" x="6" y="530" w="64" h="20" />
+        <control index="4" x="792" y="162" w="64" h="20" />
+        <control index="5" x="792" y="225" w="64" h="20" />
+        <control index="6" x="792" y="296" w="64" h="20" />
+    </setting>
+</snake>
